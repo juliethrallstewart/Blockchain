@@ -80,6 +80,7 @@ class Blockchain(object):
         # easier to work with and understand
 
         # TODO: Return the hashed block string in hexadecimal format
+        return hex_hash
         pass
 
     @property
