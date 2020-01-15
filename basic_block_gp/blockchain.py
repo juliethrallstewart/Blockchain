@@ -1,7 +1,7 @@
 import hashlib
 import json
 from time import time
-from uuid import uuid4
+from uuid import uuid4 
 
 from flask import Flask, jsonify, request
 
@@ -30,16 +30,25 @@ class Blockchain(object):
         :return: <dict> New Block
         """
 
+        # a dictionary is at its core a hashtable: 
         block = {
             # TODO
+            'index': len(self.chain) + 1,
+            'timestamp': time(),
+            'transactions': self.current_transactions,
+            'proof': proof, #proof used to mine this block - so we pass the proof in
+            'previous_hash': previous_hash #passed in - or we could get the hash of the last block (self.hash(self.chain[-1]))
         }
 
         # Reset the current list of transactions
+        self.current_transactions = []
         # Append the chain to the block
+        self.chain.append(block)
         # Return the new block
+        return block
         pass
 
-    def hash(block):
+    def hash(self,block):
         """
         Creates a SHA-256 hash of a Block
 
@@ -55,9 +64,14 @@ class Blockchain(object):
         # We must make sure that the Dictionary is Ordered,
         # or we'll have inconsistent hashes
 
-        # TODO: Create the block_string
+        # TODO: Create the block_string - a string in python is an iterable object so it has built in things
+        # .encode gets rid of all the built in object properties so we can use the sha hash
+        string_object = json.dumps(block, sort_keys=True).encode() #sort_keys is only needed for older versions of python
 
-        # TODO: Hash this string using sha256
+        # TODO: Hash this string using sha256 - never use sha1 for production
+        raw_hash = hashlib.sha256(string_object)
+
+        hex_hash = raw_hash.hexdigest() 
 
         # By itself, the sha256 function returns the hash in a raw string
         # that will likely include escaped characters.
@@ -119,6 +133,7 @@ def mine():
 
     response = {
         # TODO: Send a JSON response with the new block
+        'test': 'help meeeeeee!'
     }
 
     return jsonify(response), 200
@@ -128,10 +143,13 @@ def mine():
 def full_chain():
     response = {
         # TODO: Return the chain and its current length
+        'length': len(blockchain.chain),
+        'chain': blockchain.chain
     }
     return jsonify(response), 200
 
 
 # Run the program on port 5000
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True) #to auto update set debug=True
+    #, else you have to manually restart server each time
