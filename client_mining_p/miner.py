@@ -16,7 +16,7 @@ def proof_of_work(block):
     in an effort to find a number that is a valid proof
     :return: A valid proof for the provided block
     """
-    block_string = json.dumps(block)
+    block_string = json.dumps(block, sort_keys=True)
     proof = 0
     while valid_proof(block_string, proof) is False:
         proof += 1
@@ -89,7 +89,7 @@ if __name__ == '__main__':
         # add 1 to the number of coins mined and print it.  Otherwise,
         # print the message from the server.
         coin_total = 0
-        if data == "New Block Forged":
+        if data.get('message') == "New Block Forged":
             coin_total += 1
             print(f"Coin total: {coin_total}")
         else:
